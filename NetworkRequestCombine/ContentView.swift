@@ -9,14 +9,70 @@ import SwiftUI
 import Combine
 
 struct ContentView: View {
+    @State var selection = 0
+    @ObservedObject var viewModel = viewModel()
+    
+    init() {
+        let coloredAppearance = UINavigationBarAppearance()
+        coloredAppearance.configureWithOpaqueBackground()
+        coloredAppearance.backgroundColor = UIColor(Color("NavColor"))
+        coloredAppearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        coloredAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        
+        UINavigationBar.appearance().standardAppearance = coloredAppearance
+        UINavigationBar.appearance().compactAppearance = coloredAppearance
+        UINavigationBar.appearance().scrollEdgeAppearance = coloredAppearance
+        
+        UINavigationBar.appearance().tintColor = .white
+    }
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+        ZStack {
+            NavigationView {
+                TabView(selection: $selection) {
+                    List(viewModel.comments){ comment in
+                        Text(comment.email)
+                    }
+                        .tabItem {
+                            Image(systemName: "house.fill")
+                            Text("Home")
+                        }
+                        .tag(0)
+                    
+                    Text("Cart")
+                        .font(.system(size: 30, weight: .bold, design: .rounded))
+                        .tabItem {
+                            Image(systemName: "bookmark.circle.fill")
+                            Text("Cart")
+                        }
+                        .tag(1)
+                    
+                    Text("Profile Tab")
+                        .font(.system(size: 30, weight: .bold, design: .rounded))
+                        .tabItem {
+                            Image(systemName: "person.crop.circle")
+                            Text("Profile")
+                        }
+                        .tag(2)
+                }  .navigationBarTitleDisplayMode(.inline)
+                    .navigationBarBackButtonHidden(true)
+                    .navigationBarTitle("Multi Commerce", displayMode: .automatic)
+                    .foregroundColor(.secondary)
+                    .navigationBarItems(trailing:
+                                            Button(action: { },
+                                                   label: {
+                        Image(systemName: "square.fill.text.grid.1x2")
+                            // .font(.title2)
+                        .foregroundColor( .accentColor)}))
+                    .edgesIgnoringSafeArea(.all)
+                    .padding(10)
+                    .accentColor(.red)
+                    .onAppear() {
+                        UITabBar.appearance().barTintColor = UIColor(Color("NavColor"))
+                    }
+            }
+            
         }
-        .padding()
     }
 }
 
@@ -33,13 +89,13 @@ struct User: Decodable {
 
 struct Post: Decodable {
     let id: Int
-    let userId: String
+    let userId: Int
     let title: String
 }
 
-struct Comment: Decodable {
-    let id: String
-    let postId: String
+struct Comment: Decodable, Identifiable {
+    let id: Int
+    let postId: Int
     let email: String
 }
 
@@ -47,8 +103,33 @@ struct Comment: Decodable {
 struct CombineImp {
     
     func getUsers() -> AnyPublisher<[User], Error> {
-        
+        let url = URL(string: "https://jsonplaceholder.typicode.com/users")!
+        return URLSession.shared.dataTaskPublisher(for: url)
+            .map({$0.data})
+            .decode(type: [User].self, decoder : JSONDecoder())
+            .eraseToAnyPublisher()
     }
+}
+
+func getPost(userId: Int) -> AnyPublisher<[Post], Error> {
+    let url = URL(string: "https://jsonplaceholder.typicode.com/posts?userId=\(userId)")!
+    return URLSession.shared.dataTaskPublisher(for: url)
+        .map({$0.data})
+        .decode(type: [Post].self, decoder : JSONDecoder())
+        .eraseToAnyPublisher()
+    }
+
+func getComment(postId: Int) -> AnyPublisher<[Comment], Error> {
+    let url = URL(string: "https://jsonplaceholder.typicode.com/comments?postId=\(postId)")!
+    return URLSession.shared.dataTaskPublisher(for: url)
+        .map({$0.data})
+        .decode(type: [Comment].self, decoder : JSONDecoder())
+        .eraseToAnyPublisher()
+    }
+
+class ViewModel: ObservableObject {
+    
+    @Published var comments : [Comment] = []
 }
 
 struct AwaitAsyncImp {
