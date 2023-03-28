@@ -10,12 +10,13 @@ import Combine
 
 struct ContentView: View {
     @State var selection = 0
-    @StateObject private var viewModel = ViewModel()
-    
-    init() {
+    @StateObject private var viewModel: ViewModel
+    var combineImp = CombineImp()
+    init(dataService: CombineImp) {
+        _viewModel = StateObject(wrappedValue: ViewModel(dataService: dataService))
         let coloredAppearance = UINavigationBarAppearance()
         coloredAppearance.configureWithOpaqueBackground()
-        coloredAppearance.backgroundColor = UIColor(Color("NavColor"))
+        coloredAppearance.backgroundColor = .gray //UIColor(Color("NavColor"))
         coloredAppearance.titleTextAttributes = [.foregroundColor: UIColor.white]
         coloredAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
         
@@ -31,23 +32,24 @@ struct ContentView: View {
             NavigationView {
                 TabView(selection: $selection) {
                     List(viewModel.comments) { comment in
-                        Text(comment.email)
+                        Text(comment.email).foregroundColor(.secondary)
                     }
                     .tabItem {
                         Image(systemName: "house.fill")
-                        Text("Home")
+                        Text("Posts")
                     }
                     .tag(0)
                     
-                    Text("Cart")
-                        .font(.system(size: 30, weight: .bold, design: .rounded))
+                    List(viewModel.comments) { comment in
+                        Text(comment.email).foregroundColor(.secondary)
+                    }
                         .tabItem {
                             Image(systemName: "bookmark.circle.fill")
-                            Text("Cart")
+                            Text("Comments")
                         }
                         .tag(1)
                     
-                    Text("Profile Tab")
+                    Text("Users")
                         .font(.system(size: 30, weight: .bold, design: .rounded))
                         .tabItem {
                             Image(systemName: "person.crop.circle")
@@ -56,14 +58,8 @@ struct ContentView: View {
                         .tag(2)
                 }  .navigationBarTitleDisplayMode(.inline)
                     .navigationBarBackButtonHidden(true)
-                    .navigationBarTitle("Multi Commerce", displayMode: .automatic)
+                    .navigationBarTitle("Dependency Injection", displayMode: .automatic)
                     .foregroundColor(.secondary)
-                    .navigationBarItems(trailing:
-                                            Button(action: { },
-                                                   label: {
-                        Image(systemName: "square.fill.text.grid.1x2")
-                            // .font(.title2)
-                        .foregroundColor( .accentColor)}))
                     .edgesIgnoringSafeArea(.all)
                     .padding(10)
                     .accentColor(.red)
@@ -77,8 +73,11 @@ struct ContentView: View {
 }
 
 struct ContentView_Previews: PreviewProvider {
+    
+    static let dataService = CombineImp()
     static var previews: some View {
-        ContentView()
+        
+        ContentView(dataService: dataService)
     }
 }
 
@@ -87,7 +86,7 @@ struct User: Codable {
     let name: String
 }
 
-struct Post: Decodable {
+struct Post: Decodable,  Identifiable {
     let id: Int
     let userId: Int
     let title: String
@@ -100,9 +99,9 @@ struct Comment: Decodable, Identifiable {
 }
 
 
-class CombineImp {
+struct CombineImp {
     
-    static let shared = CombineImp()
+   // static let shared = CombineImp()
     
     func getUsers() -> AnyPublisher<[User], Error> {
         let url = URL(string: "https://jsonplaceholder.typicode.com/users")!
@@ -135,19 +134,27 @@ class CombineImp {
 class ViewModel: ObservableObject {
     
     @Published var comments : [Comment] = []
+    var combineImp = CombineImp()
+    
+    init(dataService: CombineImp) {
+        self.combineImp = dataService
+        self.getComments()
+    }
+    
     var cancellables = Set<AnyCancellable>()
     func getUsers(){
       //  CombineImp.shared.getUsers()
     }
+    
     func getComments(){
-        CombineImp.shared.getComment(postId: 2)
+        combineImp.getComment(postId: 2)
             .sink { _ in
-                
                 
             }  receiveValue: { [weak self] returnedComments in
                 self?.comments = returnedComments
-                
-            }
+             }.store(in: &cancellables)
+        
+        print(comments)
     }
 }
 
