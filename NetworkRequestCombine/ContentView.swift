@@ -11,7 +11,7 @@ import Combine
 struct ContentView: View {
     @State var selection = 0
     @StateObject private var viewModel: ViewModel
-    var combineImp = CombineImp()
+  //  var combineImp = CombineImp()
     init(dataService: CombineImp) {
         _viewModel = StateObject(wrappedValue: ViewModel(dataService: dataService))
         let coloredAppearance = UINavigationBarAppearance()
@@ -31,8 +31,8 @@ struct ContentView: View {
         ZStack {
             NavigationView {
                 TabView(selection: $selection) {
-                    List(viewModel.comments) { comment in
-                        Text(comment.email).foregroundColor(.secondary)
+                    List(viewModel.posts) { post in
+                        Text(post.title).foregroundColor(.secondary)
                     }
                     .tabItem {
                         Image(systemName: "house.fill")
@@ -49,7 +49,9 @@ struct ContentView: View {
                         }
                         .tag(1)
                     
-                    Text("Users")
+                    List(viewModel.users) { user in
+                        Text(user.name).foregroundColor(.secondary)
+                    }
                         .font(.system(size: 30, weight: .bold, design: .rounded))
                         .tabItem {
                             Image(systemName: "person.crop.circle")
@@ -81,7 +83,7 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
-struct User: Codable {
+struct User: Codable, Identifiable {
     let id: Int
     let name: String
 }
@@ -100,8 +102,6 @@ struct Comment: Decodable, Identifiable {
 
 
 struct CombineImp {
-    
-   // static let shared = CombineImp()
     
     func getUsers() -> AnyPublisher<[User], Error> {
         let url = URL(string: "https://jsonplaceholder.typicode.com/users")!
@@ -134,16 +134,28 @@ struct CombineImp {
 class ViewModel: ObservableObject {
     
     @Published var comments : [Comment] = []
+    @Published var posts : [Post] = []
+    @Published var users : [User] = []
+    
     var combineImp = CombineImp()
     
     init(dataService: CombineImp) {
         self.combineImp = dataService
         self.getComments()
+        self.getUsers()
+        self.gePosts()
     }
     
     var cancellables = Set<AnyCancellable>()
     func getUsers(){
-      //  CombineImp.shared.getUsers()
+        combineImp.getUsers()
+            .sink { _ in
+                
+            }  receiveValue: { [weak self] returnedUsers in
+                self?.users = returnedUsers
+            }.store(in: &cancellables)
+        
+        print(users)
     }
     
     func getComments(){
@@ -156,7 +168,19 @@ class ViewModel: ObservableObject {
         
         print(comments)
     }
+    
+    func gePosts(){
+        combineImp.getPost(userId: 2)
+            .sink { _ in
+                
+            }  receiveValue: { [weak self] returnedPosts in
+                self?.posts = returnedPosts
+            }.store(in: &cancellables)
+        
+        print(posts)
+    }
 }
+
 
 struct AwaitAsyncImp {
     
