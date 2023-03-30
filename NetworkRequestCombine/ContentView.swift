@@ -12,8 +12,8 @@ struct ContentView: View {
     @State var selection = 0
     @StateObject private var viewModel: ViewModel
   //  var combineImp = CombineImp()
-    init(dataService: MockImp) {
-        _viewModel = StateObject(wrappedValue: ViewModel(dataService: dataService as DataServiceProtocol))
+    init(dataService: CombineImp) {
+        _viewModel = StateObject(wrappedValue: ViewModel(dataService: dataService as! DataServiceProtocol))
         let coloredAppearance = UINavigationBarAppearance()
         coloredAppearance.configureWithOpaqueBackground()
         coloredAppearance.backgroundColor = .gray //UIColor(Color("NavColor"))
@@ -76,7 +76,7 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     
-    static let dataService = MockImp()
+    static let dataService = CombineImp()
     static var previews: some View {
         
         ContentView(dataService: dataService)
@@ -167,7 +167,7 @@ class ViewModel: ObservableObject {
     @Published var posts : [Post] = []
     @Published var users : [User] = []
     
-    var dataService: DataServiceProtocol
+    let dataService: DataServiceProtocol
     
     init(dataService: DataServiceProtocol) {
         self.dataService = dataService
