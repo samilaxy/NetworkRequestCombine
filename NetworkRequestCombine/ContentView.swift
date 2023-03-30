@@ -12,8 +12,8 @@ struct ContentView: View {
     @State var selection = 0
     @StateObject private var viewModel: ViewModel
   //  var combineImp = CombineImp()
-    init(dataService: CombineImp) {
-        _viewModel = StateObject(wrappedValue: ViewModel(dataService: dataService))
+    init(dataService: MockImp) {
+        _viewModel = StateObject(wrappedValue: ViewModel(dataService: dataService as DataServiceProtocol))
         let coloredAppearance = UINavigationBarAppearance()
         coloredAppearance.configureWithOpaqueBackground()
         coloredAppearance.backgroundColor = .gray //UIColor(Color("NavColor"))
@@ -76,7 +76,7 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     
-    static let dataService = CombineImp()
+    static let dataService = MockImp()
     static var previews: some View {
         
         ContentView(dataService: dataService)
@@ -100,8 +100,13 @@ struct Comment: Decodable, Identifiable {
     let email: String
 }
 
+protocol DataServiceProtocol {
+    func getUsers() -> AnyPublisher<[User], Error>
+    func getPost(userId: Int) -> AnyPublisher<[Post], Error>
+    func getComment(postId: Int) -> AnyPublisher<[Comment], Error>
+}
 
-struct CombineImp {
+class CombineImp {
     
     func getUsers() -> AnyPublisher<[User], Error> {
         let url = URL(string: "https://jsonplaceholder.typicode.com/users")!
@@ -131,16 +136,41 @@ struct CombineImp {
     }
 }
 
+class MockImp : DataServiceProtocol {
+    let testUsers: [User] = [User(id: 1, name: "Sam")]
+    let testPosts: [Post] = [Post(id: 1, userId: 1, title: "Twitier")]
+    let testCommets: [Comment] = [Comment(id: 1, postId: 1, email: "gbjdj@hjfj.com")]
+    
+    func getUsers() -> AnyPublisher<[User], Error> {
+        Just(testUsers)
+            .tryMap({$0})
+            .eraseToAnyPublisher()
+    }
+    
+    func getPost(userId: Int) -> AnyPublisher<[Post], Error> {
+        Just(testPosts)
+            .tryMap({$0})
+            .eraseToAnyPublisher()
+    }
+    
+    func getComment(postId: Int) -> AnyPublisher<[Comment], Error> {
+        Just(testCommets)
+            .tryMap({$0})
+            .eraseToAnyPublisher()
+    }
+
+}
+
 class ViewModel: ObservableObject {
     
     @Published var comments : [Comment] = []
     @Published var posts : [Post] = []
     @Published var users : [User] = []
     
-    var combineImp = CombineImp()
+    var dataService: DataServiceProtocol
     
-    init(dataService: CombineImp) {
-        self.combineImp = dataService
+    init(dataService: DataServiceProtocol) {
+        self.dataService = dataService
         self.getComments()
         self.getUsers()
         self.gePosts()
@@ -148,7 +178,7 @@ class ViewModel: ObservableObject {
     
     var cancellables = Set<AnyCancellable>()
     func getUsers(){
-        combineImp.getUsers()
+        dataService.getUsers()
             .sink { _ in
                 
             }  receiveValue: { [weak self] returnedUsers in
@@ -159,7 +189,7 @@ class ViewModel: ObservableObject {
     }
     
     func getComments(){
-        combineImp.getComment(postId: 2)
+        dataService.getComment(postId: 2)
             .sink { _ in
                 
             }  receiveValue: { [weak self] returnedComments in
@@ -170,7 +200,7 @@ class ViewModel: ObservableObject {
     }
     
     func gePosts(){
-        combineImp.getPost(userId: 2)
+        dataService.getPost(userId: 2)
             .sink { _ in
                 
             }  receiveValue: { [weak self] returnedPosts in

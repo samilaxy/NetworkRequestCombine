@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct NetworkRequestCombineApp: App {
-    static let dataService = CombineImp()
+    static let dataService = MockImp()
     var body: some Scene {
         WindowGroup {
             ContentView(dataService: NetworkRequestCombineApp.dataService)
