@@ -19,6 +19,7 @@
 		49C18A1A29D0663800B460BE /* NetworkRequestCombineUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C18A1929D0663800B460BE /* NetworkRequestCombineUITests.swift */; };
 		49C18A1C29D0663800B460BE /* NetworkRequestCombineUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C18A1B29D0663800B460BE /* NetworkRequestCombineUITestsLaunchTests.swift */; };
 		49F3411B2A0CFD62008CE9C8 /* PostViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49F3411A2A0CFD62008CE9C8 /* PostViewModel.swift */; };
+		49F3411F2A0D40A1008CE9C8 /* CreatePostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49F3411E2A0D40A1008CE9C8 /* CreatePostView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +55,7 @@
 		49C18A1929D0663800B460BE /* NetworkRequestCombineUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkRequestCombineUITests.swift; sourceTree = "<group>"; };
 		49C18A1B29D0663800B460BE /* NetworkRequestCombineUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkRequestCombineUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		49F3411A2A0CFD62008CE9C8 /* PostViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostViewModel.swift; sourceTree = "<group>"; };
+		49F3411E2A0D40A1008CE9C8 /* CreatePostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePostView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +115,7 @@
 				496A164C2A0C01F200F4AC37 /* ViewModel.swift */,
 				496A164E2A0C047400F4AC37 /* Repository.swift */,
 				49F3411A2A0CFD62008CE9C8 /* PostViewModel.swift */,
+				49F3411E2A0D40A1008CE9C8 /* CreatePostView.swift */,
 			);
 			path = NetworkRequestCombine;
 			sourceTree = "<group>";
@@ -276,6 +279,7 @@
 				49F3411B2A0CFD62008CE9C8 /* PostViewModel.swift in Sources */,
 				496A16492A0BFFBA00F4AC37 /* NetworkManager.swift in Sources */,
 				49C18A0129D0663400B460BE /* ContentView.swift in Sources */,
+				49F3411F2A0D40A1008CE9C8 /* CreatePostView.swift in Sources */,
 				49C189FF29D0663400B460BE /* NetworkRequestCombineApp.swift in Sources */,
 				496A164B2A0C002F00F4AC37 /* Models.swift in Sources */,
 				496A164F2A0C047400F4AC37 /* Repository.swift in Sources */,

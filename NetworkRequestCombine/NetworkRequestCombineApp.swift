@@ -12,7 +12,7 @@ struct NetworkRequestCombineApp: App {
     static let dataService = CombineImp()
     var body: some Scene {
         WindowGroup {
-            ContentView(dataService: NetworkRequestCombineApp.dataService)
+            ContentView()
         }
     }
 }

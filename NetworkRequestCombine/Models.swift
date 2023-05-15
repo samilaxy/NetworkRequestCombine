@@ -16,6 +16,7 @@ struct User: Codable, Identifiable {
 struct Post: Decodable,  Identifiable {
     let id: Int
     let userId: Int
+    let body: String
     let title: String
 }
 

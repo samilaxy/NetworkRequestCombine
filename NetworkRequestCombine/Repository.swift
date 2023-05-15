@@ -45,7 +45,7 @@ class CombineImp {
 
 class MockImp : DataServiceProtocol {
     let testUsers: [User] = [User(id: 1, name: "Sam")]
-    let testPosts: [Post] = [Post(id: 1, userId: 1, title: "Twitier")]
+    let testPosts: [Post] = [Post(id: 1, userId: 1, body: "String", title: "Twitier")]
     let testCommets: [Comment] = [Comment(id: 1, postId: 1, email: "gbjdj@hjfj.com")]
     
     func getUsers() -> AnyPublisher<[User], Error> {
